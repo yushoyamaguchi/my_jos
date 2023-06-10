@@ -65,6 +65,7 @@ mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 
 	while (1) {
 		eip = *((uint32_t *)ebp + 1);//関数呼び出し前に、当時のスタック最上段に積まれた戻り番地
+		//(uint32_t *)この*は、デリファレンスを指すのではなく、ポインタ型へのキャストを表しているだけ
 
 		cprintf("ebp %08x  eip %08x  args", ebp, eip);
 
@@ -81,7 +82,7 @@ mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 		}
 		cprintf("+%d\n", eip - info.eip_fn_addr);
 
-		ebp = *((uint32_t *)ebp);
+		ebp = *((uint32_t *)ebp);//スタックフレームが新たに作られる時、前回のスタックフレームのebpがスタックに積まれることを利用？
 		if (ebp == 0x0) break;
 	}
 	return 0;
