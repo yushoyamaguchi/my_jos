@@ -17,3 +17,5 @@
 /myapi.key
 /.suf
 .gdbinit*
+.isofiles/*
+*.iso
