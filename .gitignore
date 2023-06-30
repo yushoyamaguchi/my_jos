@@ -16,5 +16,7 @@
 /sol?/
 /myapi.key
 /.suf
+.gdbinit*
+isofiles/*
 *.elf
 *.iso
