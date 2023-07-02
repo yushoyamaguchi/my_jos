@@ -145,6 +145,10 @@ QEMUOPTS += $(shell if $(QEMU) -nographic -help | grep -q '^-D '; then echo '-D 
 IMAGES = $(OBJDIR)/kern/kernel.img
 QEMUOPTS += $(QEMUEXTRA)
 
+QEMUOPTS_NO_SERIAL = -drive file=$(OBJDIR)/kern/kernel.img,index=0,media=disk,format=raw -gdb tcp::$(GDBPORT)
+QEMUOPTS_NO_SERIAL += $(shell if $(QEMU) -nographic -help | grep -q '^-D '; then echo '-D qemu.log'; fi)
+QEMUOPTS_NO_SERIAL += $(QEMUEXTRA)
+
 .gdbinit: .gdbinit.tmpl
 	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@
 
@@ -166,13 +170,32 @@ qemu-gdb: $(IMAGES) pre-qemu
 	@echo "***"
 	@echo "*** Now run 'make gdb'." 1>&2
 	@echo "***"
-	$(QEMU) $(QEMUOPTS) -S
+	$(QEMU) $(QEMUOPTS) -S -s
 
 qemu-nox-gdb: $(IMAGES) pre-qemu
 	@echo "***"
 	@echo "*** Now run 'make gdb'." 1>&2
 	@echo "***"
 	$(QEMU) -nographic $(QEMUOPTS) -S
+
+qemu-only-vga: $(IMAGES) pre-qemu
+	@echo "***"
+	@echo "*** Now run 'make gdb'." 1>&2
+	@echo "***"
+	$(QEMU) $(QEMUOPTS_NO_SERIAL)
+
+qemu-gdb-vga: $(IMAGES) pre-qemu
+	@echo "***"
+	@echo "*** Now run 'make gdb'." 1>&2
+	@echo "***"
+	$(QEMU) $(QEMUOPTS_NO_SERIAL) -S
+
+qemu-monitor-gdb: $(IMAGES) pre-qemu
+	@echo "***"
+	@echo "*** Now run 'make gdb'." 1>&2
+	@echo "***"
+	$(QEMU) $(QEMUOPTS_NO_SERIAL) -S	-monitor stdio
+
 
 print-qemu:
 	@echo $(QEMU)
