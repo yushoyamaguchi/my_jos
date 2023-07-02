@@ -39,4 +39,11 @@ page_free_listは使う
 # page_free
 freeした領域を担当するPageInfo構造体の、メモリ管理リストへの追加をする
 
+# kern_pgdir
+kern_pgdirははじめ何もマッピングされていないため、pdgir_XXXみたいな関数を使って、必要なときに自分でマッピングをする必要がある。
+pgtableはまとめて構築するのではなく、必要になったときにpte_t型の領域をpgdirに登録する。
 
+
+## 備考
+MMUに登録されているpgdir,pgtableから割り出せる仮想アドレス・物理アドレスの関係と、page2paで対応付けられるpageinfo配列の要素・物理アドレスの関係は、別物っぽい。
+(pageinfo配列はあくまでも物理アドレスの使用状況把握のためのものだから？)
