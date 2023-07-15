@@ -23,11 +23,16 @@ page_tableに入れるのは物理メモリ
 
 # mem_init
 Pageinfo構造体の配列のallocする
-(nextfreeの先頭アドレスはbss領域の末端になっている)
+<br>
+nextfreeの先頭アドレスはbss領域の末端になっている
+
 
 # page_init
 基本的にはメモリを未使用のフラグを立てるのだが、例外もあるのでそれを設定する
 memlayout.hに、例外となるアドレスの定義がされている
+
+ここで、pagesが指す物理アドレスが使って良い領域であるかのチェックもしておく。
+それによって、今後pagesのアドレスを変換するだけで使って良い仮想アドレスが得られるようになる
 
 
 # page_alloc
@@ -42,6 +47,16 @@ freeした領域を担当するPageInfo構造体の、メモリ管理リスト�
 # kern_pgdir
 kern_pgdirははじめ何もマッピングされていないため、pdgir_XXXみたいな関数を使って、必要なときに自分でマッピングをする必要がある。
 pgtableはまとめて構築するのではなく、必要になったときにpte_t型の領域をpgdirに登録する。
+この登録はboot_map_region()を使って行う。
+
+# boot_map_region
+boot_map_region()は、pgdirに対して、仮想アドレスvaから始まる領域を、物理アドレスpaから始まる領域にマッピングする。
+
+pgdir_walkを使う
+
+# pgdir_walk
+pgdir_walk()は、pgdirに対して、仮想アドレスvaに対応するページテーブルのエントリを返す。
+page_allocを使用
 
 
 ## 備考
