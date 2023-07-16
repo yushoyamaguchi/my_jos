@@ -411,6 +411,17 @@ static void
 boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm)
 {
 	// Fill this function in
+	assert(va%PGSIZE == 0);
+	assert(pa%PGSIZE == 0);
+	assert(size%PGSIZE == 0);
+	int i=0;
+	for(i=0; i<size; i+=PGSIZE) {
+		pte_t* table_entry=pgdir_walk(pgdir, (void *)(va+i), 1);
+		if(table_entry == NULL) {
+			panic("boot_map_region: pgdir_walk return NULL");
+		}
+		table_entry =  (pa + i * PGSIZE) | perm | PTE_P;
+	}
 }
 
 //
