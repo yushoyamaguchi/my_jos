@@ -249,36 +249,56 @@ mem_init(void)
 void
 page_init(void)
 {
+	page_free_list = NULL;
+	physaddr_t addr;
 	// The example code here marks all physical pages as free.
 	// However this is not truly the case.  What memory is free?
 	//  1) Mark physical page 0 as in use.
 	//     This way we preserve the real-mode IDT and BIOS structures
 	//     in case we ever need them.  (Currently we don't, but...)
+	pages[0].pp_ref = 1;
+	pages[0].pp_link = NULL;
 	//  2) The rest of base memory, [PGSIZE, npages_basemem * PGSIZE)
 	//     is free.
+	for (int i = 1 ; i < npages_basemem; i++) {
+		if(addr>=IOPHYSMEM && addr<EXTPHYSMEM){
+			pages[i].pp_ref = 1;
+			pages[i].pp_link = NULL;
+			continue;
+		}
+		pages[i].pp_ref = 0;
+		pages[i].pp_link = page_free_list;
+		page_free_list = &pages[i];
+    }
 	//  3) Then comes the IO hole [IOPHYSMEM, EXTPHYSMEM), which must
 	//     never be allocated.
+	size_t first_free_page_pa = (size_t) PADDR(boot_alloc(0));
+	assert (first_free_page_pa % PGSIZE == 0);
+    assert (first_free_page_pa > EXTPHYSMEM);
+	int first_free_page_index=pa2page(first_free_page_pa)-pages;
+	for (int i=npages_basemem; i < first_free_page_index; i++) { //This area cannot be allocated 
+		pages[i].pp_ref = 1;
+		pages[i].pp_link = NULL;
+	}
 	//  4) Then extended memory [EXTPHYSMEM, ...).
 	//     Some of it is in use, some is free. Where is the kernel
 	//     in physical memory?  Which pages are already in use for
 	//     page tables and other data structures?
-	//
-	// Change the code to reflect this.
-	// NB: DO NOT actually touch the physical memory corresponding to
-	// free pages!
-	size_t i;
-	physaddr_t addr;
-	for (i = 0; i < npages; i++) {
+	for (int i=first_free_page_index; i < npages; i++) {
 		addr = page2pa(&pages[i]);
-		if (i == 0 \
-				|| (IOPHYSMEM <= addr && addr < EXTPHYSMEM) \
-				|| (EXTPHYSMEM <= addr && addr < PTSIZE)
-		   ) continue;
-
+		if(addr>=IOPHYSMEM && addr<EXTPHYSMEM){//Maybe this area don't exist in free_page
+			pages[i].pp_ref = 1;
+			pages[i].pp_link = NULL;
+			continue;
+		}
 		pages[i].pp_ref = 0;
 		pages[i].pp_link = page_free_list;
 		page_free_list = &pages[i];
 	}
+	//
+	// Change the code to reflect this.
+	// NB: DO NOT actually touch the physical memory corresponding to
+	// free pages!
 
 }
 
