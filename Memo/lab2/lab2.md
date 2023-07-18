@@ -10,6 +10,12 @@ page_init()
 page_alloc()
 page_free() 
 
+pgdir_walk()
+boot_map_region()
+page_lookup()
+page_remove()
+page_insert()
+
 
 # 全体
 メモリ管理には、物理ページの管理と仮想アドレスの管理の2つがある
@@ -60,7 +66,7 @@ pgdir_walkを使う
 pgdir_walk()は、pgdirに対して、仮想アドレスvaに対応するページテーブルのエントリを返す。
 
 - この関数が呼び出された際、新たに対応付けを行うたびに、新しいpgtableを確保する。
-(なので、はじめはそのpgtableの1024個のうち入ってるエントリは1個だけ)
+(なので、はじめはそのpgtableの1024個のうちpgtable_entryが入っているのは1個だけ)
 - この関数が呼び出された際、該当するpgtableがすでに確保されている場合は、そのpgtableのエントリを返す。
 - pgtableのサイズと1ページのサイズは同じなので、pgtableを確保するときは、page_alloc()を使うだけでよい
 

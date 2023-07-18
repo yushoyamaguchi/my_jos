@@ -393,6 +393,21 @@ pte_t *
 pgdir_walk(pde_t *pgdir, const void *va, int create)
 {
 	// Fill this function in
+	uintptr_t pdx = PDX(va);
+	if(pgdir[pdx] & PTE_P) {
+		pte_t *pgtable = KADDR(PTE_ADDR(pgdir[pdx]));
+		return &pgtable[PTX(va)];
+	}
+	else if(create){
+		struct PageInfo *new_pgtable_pp = page_alloc(ALLOC_ZERO);
+		if(new_pgtable_pp == NULL) return NULL;
+		new_pgtable_pp->pp_ref=1;
+		physaddr_t new_pgtable_pa = page2pa(new_pgtable_pp);
+		pgdir[pdx] = new_pgtable_pa|PTE_P; //Use phys address in pgdir
+		pde_t *new_pgtable_va = KADDR(new_pgtable_pa);
+		return new_pgtable_va+PTX(va);
+	}
+	else
 	return NULL;
 }
 
