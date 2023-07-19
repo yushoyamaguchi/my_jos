@@ -436,7 +436,7 @@ boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm
 		if(table_entry == NULL) {
 			panic("boot_map_region: pgdir_walk return NULL");
 		}
-		*table_entry =  (pa + i * PGSIZE) | perm | PTE_P; //Use phys address in pgtable entry
+		*table_entry =  (pa + i ) | perm | PTE_P; //Use phys address in pgtable entry
 	}
 }
 
