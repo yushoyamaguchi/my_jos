@@ -132,7 +132,7 @@ mem_init(void)
 	i386_detect_memory();
 
 	// Remove this line when you're ready to test this function.
-	panic("mem_init: This function is not finished\n");
+	//panic("mem_init: This function is not finished\n");
 
 	//////////////////////////////////////////////////////////////////////
 	// create initial page directory.
@@ -404,7 +404,7 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
 		if(new_pgtable_pp == NULL) return NULL;
 		new_pgtable_pp->pp_ref=1;
 		physaddr_t new_pgtable_pa = page2pa(new_pgtable_pp);
-		pgdir[pdx] = new_pgtable_pa|PTE_P; //Use phys address in pgdir entry
+		pgdir[pdx] = new_pgtable_pa|PTE_P|PTE_U; //Use phys address in pgdir entry
 		pde_t *new_pgtable_va = KADDR(new_pgtable_pa);
 		return new_pgtable_va+PTX(va);
 	}
