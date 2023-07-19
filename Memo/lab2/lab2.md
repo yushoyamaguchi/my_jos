@@ -62,6 +62,8 @@ boot_map_region()は、pgdirに対して、仮想アドレスvaから始まる�
 
 pgdir_walkを使う
 
+名前の通り、boot_map_region()は、paging設定完了前の段階でのみ呼び出される。
+(以降はpage_insertを使う？)
 # pgdir_walk
 pgdir_walk()は、pgdirに対して、仮想アドレスvaに対応するページテーブルのエントリを返す。
 
@@ -69,6 +71,15 @@ pgdir_walk()は、pgdirに対して、仮想アドレスvaに対応するペー�
 (なので、はじめはそのpgtableの1024個のうちpgtable_entryが入っているのは1個だけ)
 - この関数が呼び出された際、該当するpgtableがすでに確保されている場合は、そのpgtableのエントリを返す。
 - pgtableのサイズと1ページのサイズは同じなので、pgtableを確保するときは、page_alloc()を使うだけでよい
+
+# page_insert
+page_insert()は、物理ページppを、仮想アドレスvaに対応付ける。
+これを呼び出せるのは、ページングの設定が終わった後。
+それまでは、boot_map_region()を使う。
+
+
+とは言っても、どっちもpgdir_walkに多くの処理を任せているが
+
 
 
 ## 備考
