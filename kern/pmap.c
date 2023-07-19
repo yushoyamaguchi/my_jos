@@ -261,6 +261,7 @@ page_init(void)
 	//  2) The rest of base memory, [PGSIZE, npages_basemem * PGSIZE)
 	//     is free.
 	for (int i = 1 ; i < npages_basemem; i++) {
+		addr=page2pa(&pages[i]);
 		if(addr>=IOPHYSMEM && addr<EXTPHYSMEM){
 			pages[i].pp_ref = 1;
 			pages[i].pp_link = NULL;
@@ -435,7 +436,7 @@ boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm
 		if(table_entry == NULL) {
 			panic("boot_map_region: pgdir_walk return NULL");
 		}
-		table_entry =  (pa + i * PGSIZE) | perm | PTE_P; //Use phys address in pgtable entry
+		*table_entry =  (pa + i * PGSIZE) | perm | PTE_P; //Use phys address in pgtable entry
 	}
 }
 
@@ -468,6 +469,19 @@ int
 page_insert(pde_t *pgdir, struct PageInfo *pp, void *va, int perm)
 {
 	// Fill this function in
+	uint32_t va_for_assert = (uint32_t)va;
+	assert(va_for_assert%PGSIZE == 0);
+	pte_t *pgtable_entry=pgdir_walk(pgdir, va, 1);
+	if(pgtable_entry==NULL) return -E_NO_MEM;
+	if(*pgtable_entry & PTE_P) {
+		if(PTE_ADDR(*pgtable_entry) == page2pa(pp)) {
+			*pgtable_entry = page2pa(pp) | perm | PTE_P;
+			return 0;
+		}
+		page_remove(pgdir, va);
+	}
+	*pgtable_entry = page2pa(pp) | perm | PTE_P;
+	pp->pp_ref++;
 	return 0;
 }
 
