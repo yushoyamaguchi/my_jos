@@ -486,7 +486,17 @@ struct PageInfo *
 page_lookup(pde_t *pgdir, void *va, pte_t **pte_store)
 {
 	// Fill this function in
-	return NULL;
+	pte_t *pte = pgdir_walk(pgdir, va, false);
+    if (!pte) {
+        return NULL;
+    }
+    if (!(*pte & PTE_P)) {
+        return NULL;
+    }
+    if (pte_store) {
+        *pte_store = pte;
+    }
+	return pa2page(PTE_ADDR(*pte));
 }
 
 //
@@ -508,6 +518,13 @@ void
 page_remove(pde_t *pgdir, void *va)
 {
 	// Fill this function in
+	pte_t *the_pgtable_entry;
+	struct PageInfo *pp = page_lookup(pgdir, va, &the_pgtable_entry);
+	if(pp != NULL) {
+		*the_pgtable_entry = 0;
+		page_decref(pp);
+		tlb_invalidate(pgdir, va);
+	}
 }
 
 //
