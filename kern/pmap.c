@@ -277,6 +277,8 @@ page_init(void)
 	assert (first_free_page_pa % PGSIZE == 0);
     assert (first_free_page_pa > EXTPHYSMEM);
 	int first_free_page_index=pa2page(first_free_page_pa)-pages;
+	//cprintf("%x , %x\n",npages_basemem,IOPHYSMEM/PGSIZE);
+	//above : same as 0xA0
 	for (int i=npages_basemem; i < first_free_page_index; i++) { //This area cannot be allocated 
 		pages[i].pp_ref = 1;
 		pages[i].pp_link = NULL;
