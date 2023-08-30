@@ -57,6 +57,15 @@ i386_detect_memory(void)
 }
 
 
+static void detect_memory_kvmm(){
+	size_t basemem,totalmem;
+	totalmem=80000;
+	basemem=640;
+
+	npages=totalmem/(PGSIZE / 1024);
+	npages_basemem=basemem/(PGSIZE / 1024);
+}
+
 // --------------------------------------------------------------
 // Set up memory mappings above UTOP.
 // --------------------------------------------------------------
@@ -129,7 +138,8 @@ mem_init(void)
 	size_t n;
 
 	// Find out how much memory the machine has (npages & npages_basemem).
-	i386_detect_memory();
+	//i386_detect_memory();
+	detect_memory_kvmm();
 
 	// Remove this line when you're ready to test this function.
 	//panic("mem_init: This function is not finished\n");
