@@ -6,6 +6,7 @@
 #include <inc/string.h>
 #include <inc/assert.h>
 
+#include <kern/env.h>
 #include <kern/pmap.h>
 #include <kern/kclock.h>
 
@@ -158,6 +159,11 @@ mem_init(void)
 	pages=(struct PageInfo *)boot_alloc(npages*sizeof(struct PageInfo));
 	memset(pages,0,npages*sizeof(struct PageInfo));
 
+	//////////////////////////////////////////////////////////////////////
+	// Make 'envs' point to an array of size 'NENV' of 'struct Env'.
+	envs=(struct Env *)boot_alloc(NENV*sizeof(struct Env));
+	memset(envs,0,NENV*sizeof(struct Env));
+
 
 	//////////////////////////////////////////////////////////////////////
 	// Now that we've allocated the initial kernel data structures, we set
@@ -183,6 +189,11 @@ mem_init(void)
 	// Your code goes here:
 	// In boot_map_region, we need to add the permission of the page table entry to PTE_P (yusho)
 	boot_map_region(kern_pgdir,UPAGES,ROUNDUP(npages*sizeof(struct PageInfo),PGSIZE),PADDR(pages),PTE_U);
+
+
+	//////////////////////////////////////////////////////////////////////
+	//
+	boot_map_region(kern_pgdir,UENVS,ROUNDUP(NENV*sizeof(struct Env),PGSIZE),PADDR(envs),PTE_U);
 
 	//////////////////////////////////////////////////////////////////////
 	// Use the physical memory that 'bootstack' refers to as the kernel
@@ -721,6 +732,9 @@ check_kern_pgdir(void)
 	for (i = 0; i < n; i += PGSIZE)
 		assert(check_va2pa(pgdir, UPAGES + i) == PADDR(pages) + i);
 
+	n = ROUNDUP(NENV*sizeof(struct Env), PGSIZE);
+	for(i = 0; i < n; i += PGSIZE)
+		assert(check_va2pa(pgdir, UENVS + i) == PADDR(envs) + i);
 
 	// check phys mem
 	for (i = 0; i < npages * PGSIZE; i += PGSIZE)
@@ -737,6 +751,9 @@ check_kern_pgdir(void)
 		case PDX(UVPT):
 		case PDX(KSTACKTOP-1):
 		case PDX(UPAGES):
+			assert(pgdir[i] & PTE_P);
+			break;
+		case PDX(UENVS):
 			assert(pgdir[i] & PTE_P);
 			break;
 		default:
