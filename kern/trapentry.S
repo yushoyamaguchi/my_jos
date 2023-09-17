@@ -53,3 +53,14 @@
  * Lab 3: Your code here for _alltraps
  */
 
+_alltraps:
+    pushl %ds
+	pushl %es
+	pushal	//Push All General Registers
+	pushl $GD_KD
+	popl %ds
+	pushl $GD_KD
+	popl %es
+	pushl %esp
+	call trap
+
