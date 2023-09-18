@@ -24,6 +24,8 @@ struct Command {
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
+	{ "backtrace", "Display backtrace of function call", mon_backtrace },
+	{ "pftest", "Intentional Page Fault", mon_pftest },
 };
 
 /***** Implementations of basic kernel monitor commands *****/
@@ -85,6 +87,14 @@ mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 		ebp = *((uint32_t *)ebp);//スタックフレームが新たに作られる時、前回のスタックフレームのebpがスタックに積まれることを利用？
 		if (ebp == 0x0) break;
 	}
+	return 0;
+}
+
+int mon_pftest(int argc, char **argv, struct Trapframe *tf)
+{
+	// Your code here.
+	int *ptr = (int *)0x0;
+	cprintf("%d\n", *ptr);
 	return 0;
 }
 
