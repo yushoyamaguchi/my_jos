@@ -26,6 +26,8 @@ PageInfo構造体の配列と物理ページの対応関係を辿れるような
 page_tableに入れるのは物理メモリ
 物理メモリの0~0x3fffffまでが、はじめにentry_pgdirの(KERNBASE>>PDXSHIFT)番目のpage_tableにて、マッピングされている。
 
+# boot_alloc
+pgdir差し替え前も差し替え後も、kalloc的な使い方ができる
 
 # mem_init
 Pageinfo構造体の配列のallocする
