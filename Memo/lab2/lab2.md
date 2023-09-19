@@ -28,6 +28,8 @@ page_tableに入れるのは物理メモリ
 
 # boot_alloc
 pgdir差し替え前も差し替え後も、kalloc的な使い方ができる
+<br>
+-> page_allocしたあと(それをpage_insertでマッピングし)、その領域をpage2vapaとかを介して使うほうが良い？
 
 # mem_init
 Pageinfo構造体の配列のallocする
