@@ -358,7 +358,15 @@ void
 env_create(uint8_t *binary, enum EnvType type)
 {
 	// LAB 3: Your code here.
-}
+	struct Env *e;
+	int r;
+	if ((r = env_alloc(&e, 0) != 0)) {
+		panic("create env failed\n");
+	}
+
+	load_icode(e, binary);
+	e->env_type = type;
+}	
 
 //
 // Frees env e and all memory it uses.
