@@ -345,6 +345,22 @@ load_icode(struct Env *e, uint8_t *binary)
 	// at virtual address USTACKTOP - PGSIZE.
 
 	// LAB 3: Your code here.
+	struct Elf *elfhdr = (struct Elf *)binary;
+	if(elfhdr->e_magic != ELF_MAGIC) panic("load_icode: invalid ELF");
+	struct Proghdr *ph, *eph;
+	ph = (struct Proghdr *)(binary + elfhdr->e_phoff);
+	eph = ph + elfhdr->e_phnum;
+	lcr3(PADDR(e->env_pgdir));
+	for(; ph < eph; ph++){
+		if(ph->p_type == ELF_PROG_LOAD){
+			region_alloc(e, (void *)ph->p_va, ph->p_memsz);
+			memmove((void *)ph->p_va, binary + ph->p_offset, ph->p_filesz);
+			memset((void *)(ph->p_va + ph->p_filesz), 0, ph->p_memsz - ph->p_filesz);
+		}
+	}
+	lcr3(PADDR(kern_pgdir));
+	e->env_tf.tf_eip = elfhdr->e_entry;
+	region_alloc(e, (void *)(USTACKTOP - PGSIZE), PGSIZE); //Is it OK in only on kern_pgdir?
 }
 
 //
