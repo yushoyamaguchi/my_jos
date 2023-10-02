@@ -360,7 +360,7 @@ load_icode(struct Env *e, uint8_t *binary)
 	}
 	lcr3(PADDR(kern_pgdir));
 	e->env_tf.tf_eip = elfhdr->e_entry;
-	region_alloc(e, (void *)(USTACKTOP - PGSIZE), PGSIZE); //Is it OK in only on kern_pgdir?
+	region_alloc(e, (void *)(USTACKTOP - PGSIZE), PGSIZE); //Is it OK on only kern_pgdir?
 }
 
 //
