@@ -358,9 +358,10 @@ load_icode(struct Env *e, uint8_t *binary)
 			memset((void *)(ph->p_va + ph->p_filesz), 0, ph->p_memsz - ph->p_filesz);
 		}
 	}
+	region_alloc(e, (void *)(USTACKTOP - PGSIZE), PGSIZE);
 	lcr3(PADDR(kern_pgdir));
 	e->env_tf.tf_eip = elfhdr->e_entry;
-	region_alloc(e, (void *)(USTACKTOP - PGSIZE), PGSIZE); //Is it OK on only kern_pgdir?
+	//region_alloc(e, (void *)(USTACKTOP - PGSIZE), PGSIZE); //Is it OK on only kern_pgdir?
 }
 
 //
