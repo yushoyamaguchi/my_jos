@@ -11,6 +11,14 @@
 ## 実体
 envsというEnv構造体の配列を用意して、それを使う    
 
+## env_runの際
+- curenvの更新
+- CR3の入れ替え
+- レジスタの値をTrapFrame構造体から取り出して、状態を復元する。
+等をやる。
+
+(TrapFrame構造体への値の保存は、割り込みハンドラ側でやってくれてる想定？)
+
 # ユーザプロセス側のメモリ空間
 まずはkern_pgdirを丸ごとコピーしたpgdirを作成する。(pgtableは共有してる状態)。
 その後、load_icode->region_alloc->page_insertと呼び出すことによって、ユーザプログラムをロードするための仮想アドレスを物理アドレスにマップする。ここのpage_insert->pgdir_walkの流れで作られたpgtableは、このユーザプロセス用のpgdir専用となる。
