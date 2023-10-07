@@ -117,7 +117,7 @@ env_init(void)
 	// Set up envs array
 	// LAB 3: Your code here.
 	int i=0;
-	for(i=0;i<NENV;i++){
+	for(i=NENV-1; i>=0; i--){ //Make envs[0] the first free env
 		envs[i].env_id=0;
 		envs[i].env_status=ENV_FREE;
 		envs[i].env_link=env_free_list;

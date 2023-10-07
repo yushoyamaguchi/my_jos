@@ -44,7 +44,7 @@ i386_init(void)
 #endif // TEST*
 
 	// We only have one user environment for now, so just run it.
-	//env_run(&envs[0]);
+	env_run(&envs[0]);
 	while (1)
 	{
 		monitor(NULL);
