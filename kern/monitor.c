@@ -10,7 +10,6 @@
 #include <kern/console.h>
 #include <kern/monitor.h>
 #include <kern/kdebug.h>
-#include <kern/trap.h>
 
 #define CMDBUF_SIZE	80	// enough for one VGA text line
 
@@ -25,6 +24,8 @@ struct Command {
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
+	{ "backtrace", "Display backtrace of function call", mon_backtrace },
+	{ "pftest", "Intentional Page Fault", mon_pftest },
 };
 
 /***** Implementations of basic kernel monitor commands *****/
@@ -59,6 +60,41 @@ int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
 	// Your code here.
+	int i;
+	uint32_t ebp = read_ebp();
+	uint32_t eip;
+	static struct Eipdebuginfo info;
+
+	while (1) {
+		eip = *((uint32_t *)ebp + 1);//関数呼び出し前に、当時のスタック最上段に積まれた戻り番地
+		//(uint32_t *)この*は、デリファレンスを指すのではなく、ポインタ型へのキャストを表しているだけ
+
+		cprintf("ebp %08x  eip %08x  args", ebp, eip);
+
+		// 5 arguments
+		for (i = 0; i < 5; i++) {
+			cprintf(" %08x", *((uint32_t *)ebp + (i+2)));
+		}
+		cprintf("\n");
+
+		debuginfo_eip(eip, &info);
+		cprintf("       %s:%d: ", info.eip_file, info.eip_line);
+		for (i = 0; i < info.eip_fn_namelen; i++) {
+			cprintf("%c", info.eip_fn_name[i]);
+		}
+		cprintf("+%d\n", eip - info.eip_fn_addr);
+
+		ebp = *((uint32_t *)ebp);//スタックフレームが新たに作られる時、前回のスタックフレームのebpがスタックに積まれることを利用？
+		if (ebp == 0x0) break;
+	}
+	return 0;
+}
+
+int mon_pftest(int argc, char **argv, struct Trapframe *tf)
+{
+	// Your code here.
+	int *ptr = (int *)0x0;
+	cprintf("%d\n", *ptr);
 	return 0;
 }
 
@@ -116,8 +152,6 @@ monitor(struct Trapframe *tf)
 	cprintf("Welcome to the JOS kernel monitor!\n");
 	cprintf("Type 'help' for a list of commands.\n");
 
-	if (tf != NULL)
-		print_trapframe(tf);
 
 	while (1) {
 		buf = readline("K> ");

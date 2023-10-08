@@ -17,4 +17,6 @@
 /myapi.key
 /.suf
 *.iso
+*.img
 *.elf
+settings.json

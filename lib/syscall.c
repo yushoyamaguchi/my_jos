@@ -24,11 +24,11 @@ syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 		     : "=a" (ret)
 		     : "i" (T_SYSCALL),
 		       "a" (num),
-		       "d" (a1),
+		       "b" (a1),
 		       "c" (a2),
-		       "b" (a3),
-		       "D" (a4),
-		       "S" (a5)
+		       "d" (a3),
+		       "S" (a4),
+		       "D" (a5)
 		     : "cc", "memory");
 
 	if(check && ret > 0)
