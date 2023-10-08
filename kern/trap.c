@@ -199,6 +199,7 @@ trap_dispatch(struct Trapframe *tf)
 		return;
 	}
 	if (tf->tf_trapno == T_BRKPT) {
+		print_trapframe(tf);
 		monitor(tf);
 		return;
 	}
