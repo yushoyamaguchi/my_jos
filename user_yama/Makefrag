@@ -4,7 +4,7 @@ OBJDIRS += user_yama
 USERLIBS += jos
 
 $(OBJDIR)/user_yama/%.o: user_yama/%.c $(OBJDIR)/.vars.USER_CFLAGS
-	@echo + cc[USER] $<
+	@echo + cc[USER_YAMA] $<
 	@mkdir -p $(@D)
 	$(V)$(CC) -nostdinc $(USER_CFLAGS) -c -o $@ $<
 
