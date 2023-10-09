@@ -42,6 +42,7 @@ i386_init(void)
 	// Touch all you want.
 	ENV_CREATE(user_hello, ENV_TYPE_USER);
 	//ENV_CREATE(user_yama_printyama, ENV_TYPE_USER);
+	//ENV_CREATE(user_libc_printlibc, ENV_TYPE_USER);
 #endif // TEST*
 
 	// We only have one user environment for now, so just run it.
