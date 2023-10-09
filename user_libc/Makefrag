@@ -10,6 +10,6 @@ $(OBJDIR)/user_libc/%.o: user_libc/%.c $(OBJDIR)/.vars.USER_CFLAGS
 
 $(OBJDIR)/user_libc/%: $(OBJDIR)/user_libc/%.o $(OBJDIR)/lib/entry.o $(USERLIBS:%=$(OBJDIR)/lib/lib%.a) user_libc/user.ld
 	@echo + ld $@
-	$(V)$(LD) -o $@ $(ULDFLAGS) $(LDFLAGS)  $@.o  $(GCC_LIB)
+	$(LD) -o $@ $(ULDFLAGS) $(LDFLAGS)  $@.o  $(GCC_LIB) -L/usr/lib32 -lc
 	$(V)$(OBJDUMP) -S $@ > $@.asm
 	$(V)$(NM) -n $@ > $@.sym
