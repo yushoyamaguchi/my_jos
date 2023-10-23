@@ -8,8 +8,14 @@ $(OBJDIR)/user_libc/%.o: user_libc/%.c $(OBJDIR)/.vars.USER_CFLAGS
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@ $<
 
+# Specific rule for user_libc/libc_support.c
+$(OBJDIR)/user_libc/libc_support.o: user_libc/libc_support.c $(OBJDIR)/.vars.USER_CFLAGS
+	@echo + cc[USER_LIBC] $<
+	@mkdir -p $(@D)
+	$(CC) $(USER_CFLAGS) -c -o $@ $<	
+
 $(OBJDIR)/user_libc/%: $(OBJDIR)/user_libc/%.o $(OBJDIR)/lib/entry.o $(USERLIBS:%=$(OBJDIR)/lib/lib%.a) user_libc/user.ld
 	@echo + ld $@
-	$(LD) -o $@ $(ULDFLAGS) $(LDFLAGS) --entry main -static  $@.o  $(GCC_LIB) -L/usr/lib32 -lc
+	$(LD) -o $@ $(ULDFLAGS) $(LDFLAGS) --entry main -static  $< $(OBJDIR)/user_libc/libc_support.o  $(GCC_LIB) -L/usr/lib32 -lc
 	$(V)$(OBJDUMP) -S $@ > $@.asm
 	$(V)$(NM) -n $@ > $@.sym
