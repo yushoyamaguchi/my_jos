@@ -3,16 +3,21 @@ OBJDIRS += user_libc
 
 USERLIBS += jos
 
+# Specific rule for user_libc/libc_support.c
+$(OBJDIR)/user_libc/libc_support.o: user_libc/libc_support.c $(OBJDIR)/.vars.USER_CFLAGS
+	@echo + cc[USER_LIBC_SUPPORT] $<
+	@mkdir -p $(@D)
+	$(CC) $(USER_CFLAGS) -c -o $@ $<	
+
+$(OBJDIR)/user_libc/libc_support: $(OBJDIR)/user_libc/libc_support.o
+	@# Do nothing
+		
+
 $(OBJDIR)/user_libc/%.o: user_libc/%.c $(OBJDIR)/.vars.USER_CFLAGS
 	@echo + cc[USER_LIBC] $<
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@ $<
 
-# Specific rule for user_libc/libc_support.c
-$(OBJDIR)/user_libc/libc_support.o: user_libc/libc_support.c $(OBJDIR)/.vars.USER_CFLAGS
-	@echo + cc[USER_LIBC] $<
-	@mkdir -p $(@D)
-	$(CC) $(USER_CFLAGS) -c -o $@ $<	
 
 $(OBJDIR)/user_libc/%: $(OBJDIR)/user_libc/%.o $(OBJDIR)/lib/entry.o $(USERLIBS:%=$(OBJDIR)/lib/lib%.a) user_libc/user.ld
 	@echo + ld $@
