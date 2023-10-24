@@ -25,7 +25,7 @@ envid_t getpid(void)
     return sys_getenvid();
 }
 
-void exit(void)
+void _exit(void)
 {
     sys_env_destroy(0);
 }
