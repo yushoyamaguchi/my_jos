@@ -3,6 +3,15 @@ OBJDIRS += user_libc
 
 USERLIBS += jos
 
+# Specific rule for user_libc/syscall.c
+$(OBJDIR)/user_libc/syscall.o: user_libc/syscall.c $(OBJDIR)/.vars.USER_CFLAGS
+	@echo + cc[USER_LIBC_SYSCALL] $<
+	@mkdir -p $(@D)
+	$(CC) $(USER_CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/user_libc/syscall: $(OBJDIR)/user_libc/syscall.o
+	@# Do nothing	
+
 # Specific rule for user_libc/libc_support.c
 $(OBJDIR)/user_libc/libc_support.o: user_libc/libc_support.c $(OBJDIR)/.vars.USER_CFLAGS
 	@echo + cc[USER_LIBC_SUPPORT] $<
@@ -11,7 +20,7 @@ $(OBJDIR)/user_libc/libc_support.o: user_libc/libc_support.c $(OBJDIR)/.vars.USE
 
 $(OBJDIR)/user_libc/libc_support: $(OBJDIR)/user_libc/libc_support.o
 	@# Do nothing
-		
+
 
 $(OBJDIR)/user_libc/%.o: user_libc/%.c $(OBJDIR)/.vars.USER_CFLAGS
 	@echo + cc[USER_LIBC] $<
@@ -21,6 +30,6 @@ $(OBJDIR)/user_libc/%.o: user_libc/%.c $(OBJDIR)/.vars.USER_CFLAGS
 
 $(OBJDIR)/user_libc/%: $(OBJDIR)/user_libc/%.o $(OBJDIR)/lib/entry.o $(USERLIBS:%=$(OBJDIR)/lib/lib%.a) user_libc/user.ld
 	@echo + ld $@
-	$(LD) -o $@ $(ULDFLAGS) $(LDFLAGS) --entry main -static  $< $(OBJDIR)/user_libc/libc_support.o  $(GCC_LIB) -L/usr/lib32 -lc
+	$(LD) -o $@ $(ULDFLAGS) $(LDFLAGS) --entry main -static  $< $(OBJDIR)/user_libc/libc_support.o $(OBJDIR)/user_libc/syscall.o  $(GCC_LIB) -L/usr/lib32 -lc
 	$(V)$(OBJDUMP) -S $@ > $@.asm
 	$(V)$(NM) -n $@ > $@.sym

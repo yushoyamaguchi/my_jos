@@ -51,6 +51,7 @@ KERN_BINFILES :=	user/hello \
 			user/faultwrite \
 			user/faultwritekernel \
 			user_yama/printyama \
+			user_libc/syscall \
 			user_libc/libc_support \
 			user_libc/printlibc 
 

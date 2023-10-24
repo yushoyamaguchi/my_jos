@@ -1,4 +1,6 @@
-#include "../inc/lib.h"
+
+
+#include "./syscall.h"
 
 void write(int fd, const void *buf, size_t nbytes)
 {
