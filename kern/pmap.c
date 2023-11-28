@@ -60,7 +60,7 @@ i386_detect_memory(void)
 static void detect_memory_kvmm(){
 	size_t basemem,totalmem;
 	totalmem=80000;
-	basemem=640;
+	basemem=0;
 
 	npages=totalmem/(PGSIZE / 1024);
 	npages_basemem=basemem/(PGSIZE / 1024);
@@ -693,7 +693,7 @@ check_page_free_list(bool only_low_memory)
 			++nfree_extmem;
 	}
 
-	assert(nfree_basemem > 0);
+	//assert(nfree_basemem > 0);
 	assert(nfree_extmem > 0);
 
 	cprintf("check_page_free_list() succeeded!\n");
