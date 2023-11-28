@@ -176,11 +176,19 @@ qemu-nox-gdb: $(IMAGES) pre-qemu
 	@echo "***"
 	$(QEMU) -nographic $(QEMUOPTS) -S
 
+qemu-fs: $(IMAGES) pre-qemu fs.img
+	$(QEMU) $(QEMUOPTS)	
+
+
 print-qemu:
 	@echo $(QEMU)
 
 print-gdbport:
 	@echo $(GDBPORT)
+
+fs.img:
+	dd if=/dev/zero of=$(OBJDIR)/fs.img bs=1M count=100
+		
 
 # For deleting the build
 clean:
