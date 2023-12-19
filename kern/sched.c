@@ -19,10 +19,24 @@ sched_yield(void)
 	// circular fashion starting just after the env this CPU was
 	// last running.  Switch to the first such environment found.
 	//
+	int start=0;
+	int j;
+	if (curenv){
+		start = ENVX(curenv->env_id);
+	}
+	for (j = 0; j < NENV; j++) {
+		int i = (start + j) % NENV;
+		if (envs[i].env_status == ENV_RUNNABLE) {
+			env_run(&envs[i]);
+		}
+	}
 	// If no envs are runnable, but the environment previously
 	// running on this CPU is still ENV_RUNNING, it's okay to
 	// choose that environment.
 	//
+	if (curenv && curenv->env_status == ENV_RUNNING) {
+		env_run(curenv);
+	}
 	// Never choose an environment that's currently running on
 	// another CPU (env_status == ENV_RUNNING). If there are
 	// no runnable environments, simply drop through to the code
