@@ -138,7 +138,12 @@ static int
 sys_env_set_pgfault_upcall(envid_t envid, void *func)
 {
 	// LAB 4: Your code here.
-	panic("sys_env_set_pgfault_upcall not implemented");
+	struct Env *e;
+	int ret = envid2env(envid, &e, 1);
+	if (ret < 0) {
+		return ret;
+	}
+	e->env_pgfault_upcall = func;
 }
 
 // Allocate a page of memory and map it at 'va' with permission
@@ -240,7 +245,7 @@ sys_page_map(envid_t srcenvid, void *srcva,
 	}
 	//	-E_INVAL is srcva is not mapped in srcenvid's address space.
 	pte_t *pte;
-	struct PageInfo *pg = page_lookup(se->env_pgdir, srcva, &pte);
+	struct PageInfo *pg = page_lookup(srcenv->env_pgdir, srcva, &pte);
 	if (!pg) return -E_INVAL;
 
 	//	-E_INVAL if perm is inappropriate (see sys_page_alloc).
@@ -252,7 +257,7 @@ sys_page_map(envid_t srcenvid, void *srcva,
 	if (((*pte&PTE_W) == 0) && (perm&PTE_W)) return -E_INVAL;
 
 	//	-E_NO_MEM if there's no memory to allocate any necessary page tables.
-	ret = page_insert(de->env_pgdir, pg, dstva, perm);
+	ret = page_insert(dstenv->env_pgdir, pg, dstva, perm);
 	return ret;
 }
 
@@ -367,7 +372,25 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 		case SYS_yield:
 			sys_yield();
 			ret=0;
-			break;	
+			break;
+		case SYS_exofork:
+			ret=sys_exofork();
+			break;
+		case SYS_env_set_status:
+			ret=sys_env_set_status((envid_t)a1, (int)a2);
+			break;
+		case SYS_page_alloc:
+			ret=sys_page_alloc((envid_t)a1, (void *)a2, (int)a3);
+			break;
+		case SYS_page_map:
+			ret=sys_page_map((envid_t)a1, (void *)a2, (envid_t)a3, (void *)a4, (int)a5);
+			break;
+		case SYS_page_unmap:
+			ret=sys_page_unmap((envid_t)a1, (void *)a2);
+			break;
+		case SYS_env_set_pgfault_upcall:
+			ret=sys_env_set_pgfault_upcall((envid_t)a1, (void *)a2);
+			break;						
 		default:
 			return -E_INVAL;
 	}
