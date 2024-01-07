@@ -54,7 +54,15 @@ duppage(envid_t envid, unsigned pn)
 	int r;
 
 	// LAB 4: Your code here.
-	panic("duppage not implemented");
+	void *addr = (void*) (pn * PGSIZE);
+	if ((uvpt[pn] & PTE_W) || (uvpt[pn] & PTE_COW)) { 
+		if ((r = sys_page_map(0, addr, envid, addr, PTE_COW|PTE_U|PTE_P)) < 0)
+			panic("sys_page_map : %e", r);
+		if ((r = sys_page_map(0, addr, 0, addr, PTE_COW|PTE_U|PTE_P)) < 0)
+			panic("sys_page_map : %e", r);
+	} else {
+		sys_page_map(0, addr, envid, addr, PTE_U|PTE_P);	
+	}
 	return 0;
 }
 
@@ -78,7 +86,25 @@ envid_t
 fork(void)
 {
 	// LAB 4: Your code here.
-	panic("fork not implemented");
+	envid_t envid= sys_exofork();
+	if(envid < 0) {
+		panic("sys_exofork : %e", envid);
+	} else if (envid == 0) {
+		thisenv = &envs[ENVX(sys_getenvid())]; // fix thisenv in child process
+		return 0;
+	}
+	uint32_t addr;
+	for (addr = UTEXT; addr < USTACKTOP; addr += PGSIZE) {
+		if ((uvpd[PDX(addr)] & PTE_P) && (uvpt[PGNUM(addr)] & PTE_P)) {
+			duppage(envid, PGNUM(addr));
+		}
+	}
+	int r;
+	if ((r = sys_page_alloc(envid, (void*) (UXSTACKTOP - PGSIZE), PTE_U|PTE_P|PTE_W)) < 0)
+		panic("sys_page_alloc : %e", r);	
+	if ((r = sys_env_set_status(envid, ENV_RUNNABLE)) < 0)
+		panic("sys_env_set_status : %e", r);
+	return envid;	
 }
 
 // Challenge!
