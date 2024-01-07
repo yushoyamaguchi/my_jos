@@ -4,3 +4,10 @@ trapframeが保存されるのはシステムコールを呼んだときなの�
 よって子プロセスは、forkシステムコールが呼ばれた次の命令から実行が開始される。
 
 exoforkシステムコール内で子プロセス用のenvのtrapframeのeaxに0を入れているので、子プロセスからしたらexoforkシステムコールの返り値が0であるように見える。
+
+
+# Copy-on-Write fork
+子プロセスとのメモリ空間の共有を実現するために、当初はpage_mapだけを行う。
+writeが行われるとpagefaultが発生し、page_fault_handlerが呼ばれる。
+そこで、page_allocとそこへのメモリコピー、page_unmapを行う。
+josではこういうことを全部ユーザ空間でやるようにしているが、Linuxでもそうなのだろうか？
