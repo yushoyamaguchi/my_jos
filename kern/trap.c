@@ -86,6 +86,8 @@ extern void simderr_handler();
 extern void syscall_handler();
 extern void default_handler();
 extern void timer_handler();
+extern void kbd_handler();
+extern void serial_handler();
 
 
 void
@@ -117,6 +119,8 @@ trap_init(void)
 	SETGATE(idt[T_DEFAULT], 0, GD_KT, default_handler, 0);
 
 	SETGATE(idt[IRQ_OFFSET+IRQ_TIMER], 0, GD_KT, timer_handler, 0);
+	SETGATE(idt[IRQ_OFFSET+IRQ_KBD], 0, GD_KT, kbd_handler, 0);
+	SETGATE(idt[IRQ_OFFSET+IRQ_SERIAL], 0, GD_KT, serial_handler, 0);
 
 
 	// Per-CPU setup 
