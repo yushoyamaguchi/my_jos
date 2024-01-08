@@ -85,6 +85,7 @@ extern void mchk_handler();
 extern void simderr_handler();
 extern void syscall_handler();
 extern void default_handler();
+extern void timer_handler();
 
 
 void
@@ -114,6 +115,8 @@ trap_init(void)
 	SETGATE(idt[T_SIMDERR], 0, GD_KT, simderr_handler, 0);
 	SETGATE(idt[T_SYSCALL], 0, GD_KT, syscall_handler, 3);
 	SETGATE(idt[T_DEFAULT], 0, GD_KT, default_handler, 0);
+
+	SETGATE(idt[IRQ_OFFSET+IRQ_TIMER], 0, GD_KT, timer_handler, 0);
 
 
 	// Per-CPU setup 
