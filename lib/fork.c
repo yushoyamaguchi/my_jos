@@ -66,6 +66,22 @@ duppage(envid_t envid, unsigned pn)
 	return 0;
 }
 
+void
+duppage_cp(envid_t dstenv, void *addr)
+{
+	int r;
+
+	// This is NOT what you should do in your fork.
+	if ((r = sys_page_alloc(dstenv, addr, PTE_P|PTE_U|PTE_W)) < 0)
+		panic("sys_page_alloc: %e", r);
+	if ((r = sys_page_map(dstenv, addr, 0, UTEMP, PTE_P|PTE_U|PTE_W)) < 0)
+		panic("sys_page_map: %e", r);
+	memmove(UTEMP, addr, PGSIZE);
+	if ((r = sys_page_unmap(0, UTEMP)) < 0)
+		panic("sys_page_unmap: %e", r);
+}
+
+
 //
 // User-level fork with copy-on-write.
 // Set up our page fault handler appropriately.
@@ -95,9 +111,7 @@ fork(void)
 	}
 	uint32_t addr;
 	for (addr = UTEXT; addr < USTACKTOP; addr += PGSIZE) {
-		if ((uvpd[PDX(addr)] & PTE_P) && (uvpt[PGNUM(addr)] & PTE_P)) {
-			duppage(envid, PGNUM(addr));
-		}
+		duppage_cp(envid, (void*) addr); // copy address space (Not Copy-on-write)
 	}
 	int r;
 	if ((r = sys_page_alloc(envid, (void*) (UXSTACKTOP - PGSIZE), PTE_U|PTE_P|PTE_W)) < 0)
