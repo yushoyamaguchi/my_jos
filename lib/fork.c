@@ -25,6 +25,9 @@ pgfault(struct UTrapframe *utf)
 	//   (see <inc/memlayout.h>).
 
 	// LAB 4: Your code here.
+	if (!((err & FEC_WR) && (uvpt[PGNUM(addr)] & PTE_COW))) { 
+		panic("pgfault():not cow");
+	}
 
 	// Allocate a new page, map it at a temporary location (PFTEMP),
 	// copy the data from the old page to the new page, then move the new
@@ -101,6 +104,7 @@ duppage_cp(envid_t dstenv, void *addr)
 envid_t
 fork(void)
 {
+	extern unsigned char end[];
 	// LAB 4: Your code here.
 	envid_t envid= sys_exofork();
 	if(envid < 0) {
@@ -109,10 +113,12 @@ fork(void)
 		thisenv = &envs[ENVX(sys_getenvid())]; // fix thisenv in child process
 		return 0;
 	}
-	uint32_t addr;
-	for (addr = UTEXT; addr < USTACKTOP; addr += PGSIZE) {
+	uint8_t *addr;
+	cprintf("fork : before duppage_cp\n");
+	for (addr = (uint8_t*)UTEXT; addr < end; addr += PGSIZE) {
 		duppage_cp(envid, (void*) addr); // copy address space (Not Copy-on-write)
 	}
+	cprintf("fork : after duppage_cp\n");
 	int r;
 	if ((r = sys_page_alloc(envid, (void*) (UXSTACKTOP - PGSIZE), PTE_U|PTE_P|PTE_W)) < 0)
 		panic("sys_page_alloc : %e", r);	
