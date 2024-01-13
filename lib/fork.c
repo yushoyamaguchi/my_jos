@@ -114,11 +114,9 @@ fork(void)
 		return 0;
 	}
 	uint8_t *addr;
-	cprintf("fork : before duppage_cp\n");
 	for (addr = (uint8_t*)UTEXT; addr < end; addr += PGSIZE) {
 		duppage_cp(envid, (void*) addr); // copy address space (Not Copy-on-write)
 	}
-	cprintf("fork : after duppage_cp\n");
 	duppage_cp(envid, ROUNDDOWN(&addr, PGSIZE));
 	// Start the child environment running
 	int r;
