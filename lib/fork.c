@@ -119,11 +119,11 @@ fork(void)
 		duppage_cp(envid, (void*) addr); // copy address space (Not Copy-on-write)
 	}
 	cprintf("fork : after duppage_cp\n");
+	duppage_cp(envid, ROUNDDOWN(&addr, PGSIZE));
+	// Start the child environment running
 	int r;
-	if ((r = sys_page_alloc(envid, (void*) (UXSTACKTOP - PGSIZE), PTE_U|PTE_P|PTE_W)) < 0)
-		panic("sys_page_alloc : %e", r);	
 	if ((r = sys_env_set_status(envid, ENV_RUNNABLE)) < 0)
-		panic("sys_env_set_status : %e", r);
+		panic("sys_env_set_status: %e", r);
 	return envid;	
 }
 
