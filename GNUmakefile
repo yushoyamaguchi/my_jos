@@ -188,7 +188,10 @@ print-gdbport:
 
 fs.img:
 	dd if=/dev/zero of=$(OBJDIR)/fs.img bs=1M count=100
-		
+	
+kernel_only.img:
+	$(V)dd if=$(OBJDIR)/kern/kernel of=$(OBJDIR)/kern/kernel_only.img~ conv=notrunc 2>/dev/null
+	$(V)mv $(OBJDIR)/kern/kernel_only.img~ $(OBJDIR)/kern/kernel_only.img	
 
 # For deleting the build
 clean:
