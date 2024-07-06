@@ -24,10 +24,17 @@ forkchild(const char *cur, char branch)
 void
 forktree(const char *cur)
 {
-	cprintf("%04x: I am '%s'\n", sys_getenvid(), cur);
+	cprintf("%04x: start : I am '%s'\n", sys_getenvid(), cur);
 
 	forkchild(cur, '0');
 	forkchild(cur, '1');
+	long i;
+	long big = 100000000;
+	for (i = 1; i <= big; i++){
+		if(i % big == 0){
+			cprintf("%04x: end : I am '%s'\n", sys_getenvid(), cur);
+		}
+	}
 }
 
 void
