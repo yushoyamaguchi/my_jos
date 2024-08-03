@@ -148,7 +148,7 @@ include user/Makefrag
 
 CPUS ?= 1
 
-QEMUOPTS = --enable-kvm -drive file=$(OBJDIR)/kern/kernel.img,index=0,media=disk,format=raw -serial file:serial_output.log -gdb tcp::$(GDBPORT)
+QEMUOPTS = -drive file=$(OBJDIR)/kern/kernel.img,index=0,media=disk,format=raw -serial file:serial_output.log -gdb tcp::$(GDBPORT)
 QEMUOPTS += $(shell if $(QEMU) -nographic -help | grep -q '^-D '; then echo '-D qemu.log'; fi)
 IMAGES = $(OBJDIR)/kern/kernel.img
 QEMUOPTS += -smp $(CPUS)
@@ -178,7 +178,7 @@ myqemu-nox: $(IMAGES) pre-qemu
 	@echo "***"
 	@echo "*** Use Ctrl-a x to exit qemu"
 	@echo "***"
-	$(MYQEMU) -nographic $(QEMUOPTS)	
+	$(MYQEMU) --enable-kvm -serial file:serial_output.log -nographic $(QEMUOPTS)	
 
 qemu-gdb: $(IMAGES) pre-qemu
 	@echo "***"
