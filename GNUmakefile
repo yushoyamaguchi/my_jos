@@ -174,7 +174,7 @@ myqemu-nox: $(IMAGES) pre-qemu
 	@echo "***"
 	@echo "*** Use Ctrl-a x to exit qemu"
 	@echo "***"
-	$(MYQEMU) -nographic $(QEMUOPTS)	
+	$(MYQEMU) --enable-kvm -serial file:serial_output.log -nographic $(QEMUOPTS)	
 
 qemu-gdb: $(IMAGES) pre-qemu
 	@echo "***"
