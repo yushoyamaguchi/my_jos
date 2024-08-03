@@ -63,6 +63,9 @@ QEMU := $(shell if which qemu >/dev/null 2>&1; \
 	echo "***" 1>&2; exit 1)
 endif
 
+# change as using env
+MYQEMU := ../../qemu/build/qemu-system-i386 
+
 # try to generate a unique GDB port
 GDBPORT	:= $(shell expr `id -u` % 5000 + 25000)
 
@@ -158,11 +161,20 @@ pre-qemu: .gdbinit
 qemu: $(IMAGES) pre-qemu
 	$(QEMU) $(QEMUOPTS)
 
+myqemu: $(IMAGES) pre-qemu
+	$(MYQEMU) $(QEMUOPTS)
+
 qemu-nox: $(IMAGES) pre-qemu
 	@echo "***"
 	@echo "*** Use Ctrl-a x to exit qemu"
 	@echo "***"
 	$(QEMU) -nographic $(QEMUOPTS)
+
+myqemu-nox: $(IMAGES) pre-qemu
+	@echo "***"
+	@echo "*** Use Ctrl-a x to exit qemu"
+	@echo "***"
+	$(MYQEMU) -nographic $(QEMUOPTS)	
 
 qemu-gdb: $(IMAGES) pre-qemu
 	@echo "***"
@@ -170,31 +182,29 @@ qemu-gdb: $(IMAGES) pre-qemu
 	@echo "***"
 	$(QEMU) $(QEMUOPTS) -S
 
+myqemu-gdb: $(IMAGES) pre-qemu
+	@echo "***"
+	@echo "*** Now run 'make gdb'." 1>&2
+	@echo "***"
+	$(MYQEMU) $(QEMUOPTS) -S	
+
 qemu-nox-gdb: $(IMAGES) pre-qemu
 	@echo "***"
 	@echo "*** Now run 'make gdb'." 1>&2
 	@echo "***"
 	$(QEMU) -nographic $(QEMUOPTS) -S
 
-qemu-fs: $(IMAGES) pre-qemu fs.img
-	$(QEMU) $(QEMUOPTS)	
-
+myqemu-nox-gdb: $(IMAGES) pre-qemu
+	@echo "***"
+	@echo "*** Now run 'make gdb'." 1>&2
+	@echo "***"
+	$(MYQEMU) -nographic $(QEMUOPTS) -S	
 
 print-qemu:
 	@echo $(QEMU)
 
 print-gdbport:
 	@echo $(GDBPORT)
-
-fs.img:
-	dd if=/dev/zero of=$(OBJDIR)/fs.img bs=1M count=100
-	
-kernel_only.img:
-	@echo + mk $@
-	$(V)dd if=/dev/zero of=$(OBJDIR)/kern/kernel_only.img~ count=10000 2>/dev/null
-	$(V)dd if=/dev/zero of=$(OBJDIR)/kern/kernel_only.img~ count=100000 seek=0 conv=notrunc 2>/dev/null
-	$(V)dd if=$(OBJDIR)/kern/kernel of=$(OBJDIR)/kern/kernel_only.img~ seek=1 conv=notrunc 2>/dev/null
-	$(V)mv $(OBJDIR)/kern/kernel_only.img~ $(OBJDIR)/kern/kernel_only.img	
 
 # For deleting the build
 clean:
