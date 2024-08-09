@@ -176,6 +176,12 @@ myqemu-nox: $(IMAGES) pre-qemu
 	@echo "***"
 	$(MYQEMU) --enable-kvm -nographic $(QEMUOPTS)	
 
+gdb-myqemu-nox: $(IMAGES) pre-qemu
+	@echo "***"
+	@echo "*** Use Ctrl-a x to exit qemu"
+	@echo "***"
+	gdb --args $(MYQEMU) --enable-kvm -nographic $(QEMUOPTS)		
+
 qemu-gdb: $(IMAGES) pre-qemu
 	@echo "***"
 	@echo "*** Now run 'make gdb'." 1>&2
