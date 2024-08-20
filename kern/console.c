@@ -67,10 +67,10 @@ serial_putc(int c)
 {
 	int i;
 
-	for (i = 0;
+	/*for (i = 0;
 	     !(inb(COM1 + COM_LSR) & COM_LSR_TXRDY) && i < 12800;
 	     i++)
-		delay();
+		delay();*/
 
 	outb(COM1 + COM_TX, c);
 }
@@ -113,8 +113,8 @@ lpt_putc(int c)
 {
 	int i;
 
-	for (i = 0; !(inb(0x378+1) & 0x80) && i < 12800; i++)
-		delay();
+	/*for (i = 0; !(inb(0x378+1) & 0x80) && i < 12800; i++)
+		delay();*/
 	outb(0x378+0, c);
 	outb(0x378+2, 0x08|0x04|0x01);
 	outb(0x378+2, 0x08);
