@@ -210,6 +210,9 @@ print-qemu:
 print-gdbport:
 	@echo $(GDBPORT)
 
+fs.img:
+	dd if=/dev/zero of=$(OBJDIR)/fs.img bs=1M count=100
+
 # For deleting the build
 clean:
 	rm -rf $(OBJDIR) .gdbinit jos.in qemu.log

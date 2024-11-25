@@ -35,8 +35,8 @@ i386_init(void)
 	trap_init();
 
 	// Lab 4 multiprocessor initialization functions
-	mp_init();
-	lapic_init();
+	//mp_init();
+	//lapic_init();
 
 	// Lab 4 multitasking initialization functions
 	pic_init();
