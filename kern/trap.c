@@ -88,6 +88,7 @@ extern void default_handler();
 extern void timer_handler();
 extern void kbd_handler();
 extern void serial_handler();
+extern void ide_handler();
 
 
 void
@@ -121,6 +122,7 @@ trap_init(void)
 	SETGATE(idt[IRQ_OFFSET+IRQ_TIMER], 0, GD_KT, timer_handler, 0);
 	SETGATE(idt[IRQ_OFFSET+IRQ_KBD], 0, GD_KT, kbd_handler, 0);
 	SETGATE(idt[IRQ_OFFSET+IRQ_SERIAL], 0, GD_KT, serial_handler, 0);
+	SETGATE(idt[46], 0, GD_KT, ide_handler, 0);
 
 
 	// Per-CPU setup 
@@ -267,6 +269,19 @@ trap_dispatch(struct Trapframe *tf)
 	if (tf->tf_cs == GD_KT)
 		panic("unhandled trap in kernel");
 	else {
+		cprintf("yama_debug: tf_err = 0x%x\n", tf->tf_err); // yama_debug 0x173
+		cprintf("yama_debug: UTEXT = 0x%x\n", UTEXT);
+		cprintf("yama_debug: tf_eip = 0x%x\n", tf->tf_eip); // yapma_debug UTEXT の値を変えてもここの値は変わらない
+		cprintf("yama_debug: tf_cs = 0x%x\n", tf->tf_cs); //0x1b
+		cprintf("yama_debug: Current instruction bytes: ");
+		for (int i = 0; i < 8; i++) {
+			cprintf("%02x ", *((unsigned char*)(tf->tf_eip + i)));
+		}
+		cprintf("\n");
+
+		if (tf->tf_trapno == 46) {
+			cprintf("yama_debug: IDE handler\n");
+		}
 		env_destroy(curenv);
 		return;
 	}
