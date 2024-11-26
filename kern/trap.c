@@ -267,6 +267,10 @@ trap_dispatch(struct Trapframe *tf)
 	if (tf->tf_cs == GD_KT)
 		panic("unhandled trap in kernel");
 	else {
+		cprintf("yama_debug: tf_err = 0x%x\n", tf->tf_err); // yama_debug 0x173
+		cprintf("yama_debug: UTEXT = 0x%x\n", UTEXT);
+		cprintf("yama_debug: tf_eip = 0x%x\n", tf->tf_eip); // yapma_debug UTEXT の値を変えてもここの値は変わらない
+		cprintf("yama_debug: tf_cs = 0x%x\n", tf->tf_cs); //0x1b
 		env_destroy(curenv);
 		return;
 	}
