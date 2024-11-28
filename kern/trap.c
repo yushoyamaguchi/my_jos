@@ -88,6 +88,7 @@ extern void default_handler();
 extern void timer_handler();
 extern void kbd_handler();
 extern void serial_handler();
+extern void ide_handler();
 
 
 void
@@ -121,7 +122,7 @@ trap_init(void)
 	SETGATE(idt[IRQ_OFFSET+IRQ_TIMER], 0, GD_KT, timer_handler, 0);
 	SETGATE(idt[IRQ_OFFSET+IRQ_KBD], 0, GD_KT, kbd_handler, 0);
 	SETGATE(idt[IRQ_OFFSET+IRQ_SERIAL], 0, GD_KT, serial_handler, 0);
-
+	SETGATE(idt[IRQ_OFFSET+IRQ_IDE], 0, GD_KT, ide_handler, 0);
 
 	// Per-CPU setup 
 	trap_init_percpu();
@@ -259,6 +260,11 @@ trap_dispatch(struct Trapframe *tf)
 	if (tf->tf_trapno == IRQ_OFFSET + IRQ_TIMER) {
 		lapic_eoi();
 		sched_yield();
+		return;
+	}
+
+	// Ignore IDE interrupts
+	if (tf->tf_trapno == IRQ_OFFSET + IRQ_IDE) {
 		return;
 	}
 
