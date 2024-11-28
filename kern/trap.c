@@ -282,6 +282,7 @@ trap_dispatch(struct Trapframe *tf)
 		if (tf->tf_trapno == 46) {
 			cprintf("yama_debug: IDE handler\n");
 		}
+
 		env_destroy(curenv);
 		return;
 	}
