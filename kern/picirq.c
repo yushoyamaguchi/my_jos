@@ -66,6 +66,12 @@ pic_init(void)
 
 	if (irq_mask_8259A != 0xFFFF)
 		irq_setmask_8259A(irq_mask_8259A);
+
+	if (~irq_mask_8259A & (1<<IRQ_IDE)) {
+		cprintf("ide enabled\n");
+	} else {
+		cprintf("ide disabled\n");
+	}
 }
 
 void

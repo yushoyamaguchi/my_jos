@@ -279,8 +279,9 @@ trap_dispatch(struct Trapframe *tf)
 		}
 		cprintf("\n");
 
-		if (tf->tf_trapno == 46) {
+		if (tf->tf_trapno == IRQ_OFFSET + IRQ_IDE) {
 			cprintf("yama_debug: IDE handler\n");
+			return;
 		}
 
 		env_destroy(curenv);
