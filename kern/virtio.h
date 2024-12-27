@@ -147,3 +147,6 @@ struct virtio_net_hdr {
   uint16_t  csum_offset; 
   uint16_t  num_buffers; 
 };
+
+// qemu's default virtq size is 256
+#define VIRTQ_SIZE              256
